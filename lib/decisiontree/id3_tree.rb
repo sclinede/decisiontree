@@ -58,6 +58,7 @@ module DecisionTree
       # 2. Pick best attribute
       # 3. If attributes all score the same, then pick a random one to avoid infinite recursion.
       performance = attributes.collect { |attribute| fitness_for(attribute).call(data, attributes, attribute) }
+      return data.first.last if performance.all? { |a, b| a.to_f <= 0 }
       max = performance.max { |a,b| a[0] <=> b[0] }
       min = performance.min { |a,b| a[0] <=> b[0] }
       max = performance.sample if max[0] == min[0]
@@ -102,7 +103,7 @@ module DecisionTree
       #thresholds -= used[attribute] if used.has_key? attribute
 
       gain = thresholds.collect do |threshold|
-        sp = data.partition { |d| d[attributes.index(attribute)] >= threshold }
+        sp = data.partition { |d| d[attributes.index(attribute)].to_f >= threshold }
         pos = (sp[0].size).to_f / data.size
         neg = (sp[1].size).to_f / data.size
 
